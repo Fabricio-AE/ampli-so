@@ -2,7 +2,7 @@ all: main
 	./main
 	
 main: main.o 
-	gcc -Wall -o main main.c data.c -lpthread
+	gcc -Wall -o main main.c data.c -lpthread -lm
 
 clean:
 	rm -f main *.o

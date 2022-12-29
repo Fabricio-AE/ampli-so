@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <unistd.h> // read(), write(), close()
 #include "data.h"
+#include "string.h"
 #define MAX 80
 #define PORT 8080
 #define SA struct sockaddr
@@ -16,16 +17,19 @@ void listenClients(int *params);
 
 int main(int argc, char **argv)
 {
-    //initSocket();
-    int rows = sizeColumns("A.txt");
-    printf("Columns size: %d\n", rows);
-    int sizeA[] = {3,2};
-    int sizeB[] = {2,3};
-    int multi= isMultiply( &sizeA, &sizeB);
-    printf("Es multiplicable: %d", multi);
+    // initSocket();
+    int ** matrix = getMatrix("A.txt");
+    //printf("%d", sizeColumns("A.txt"));
+    /*
+    char *row = NULL;
+    size_t len = 0;
+    FILE *fp = fopen("A.txt", "r");
+    getline(&row, &len, fp);
+    printf("%s\n", row);
+    */
     return 0;
 }
-
+/*
 void initSocket()
 {
     int socketFd, connectionFd, len;
@@ -116,3 +120,4 @@ void listenClients(int *params)
     }
     close(socketFd);
 }
+*/
