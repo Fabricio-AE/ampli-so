@@ -18,19 +18,12 @@ int **getMatrix(char *fileName)
 
     char *row = NULL;
     size_t len = 0;
+    int i = 0;
     while (getline(&row, &len, fp) > 0)
     {
+        int *arrayRow = getRow(row);
+        response[i++] = arrayRow;
     }
-    getline(&row, &len, fp);
-    int *arrayRow = getRow(row);
-        printf("- %d\n", columns);
-    for (int i = 0; i < columns; i++)
-    {
-    }
-    
-    // putchar(ch);
-
-    // close the file
     fclose(fp);
     return response;
 }
@@ -43,10 +36,15 @@ int *getRow(char *row)
     int count = 0;
     for (int i = 0; i < n; i++)
     {
-        if (row[i] != ','){
-            response[count] = row[i] - '0';
-            count++;
+        if (row[i] == ',')
+            continue;
+        if (row[i] == '-')
+        {
+            response[count++] = (-row[i + 1]) + '0';
+            i = i + 2;
+            continue;
         }
+        response[count++] = row[i] - '0';
     }
     return response;
 }
@@ -57,7 +55,7 @@ int sizeRows(char *fileName)
         return 0;
     FILE *fp = fopen(fileName, "r");
     char ch;
-    int size;
+    int size = 0;
     while ((ch = fgetc(fp)) != EOF)
         if (ch == '\n')
             size++;
@@ -70,7 +68,7 @@ int sizeColumns(char *fileName)
         return 0;
     FILE *fp = fopen(fileName, "r");
     char ch;
-    int size;
+    int size = 0;
     while ((ch = fgetc(fp)) != '\n')
         if (ch == ',')
             size++;

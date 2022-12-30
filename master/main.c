@@ -19,14 +19,14 @@ int main(int argc, char **argv)
 {
     // initSocket();
     int ** matrix = getMatrix("A.txt");
-    //printf("%d", sizeColumns("A.txt"));
-    /*
-    char *row = NULL;
-    size_t len = 0;
-    FILE *fp = fopen("A.txt", "r");
-    getline(&row, &len, fp);
-    printf("%s\n", row);
-    */
+    int rows = sizeRows("A.txt");
+    int columns = sizeColumns("A.txt");
+
+    for (int i = 0; i < rows; i++){
+        for (int j = 0; j < columns; j++)
+            printf("%d, ", matrix[i][j]);
+        printf("\n");
+    }
     return 0;
 }
 /*
