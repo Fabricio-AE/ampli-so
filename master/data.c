@@ -1,28 +1,52 @@
 #include "data.h"
+#include <math.h>
 
-char *readFile(char *fileName)
+int **getMatrix(char *fileName)
 {
+    int **response = (int **)malloc(0 * sizeof(int *));
+    response[0] = (int *)malloc(0 * sizeof(int));
+    if (!existsFile(fileName))
+        return response;
+
+    int rows = sizeRows(fileName);
+    int columns = sizeColumns(fileName);
+    response = (int **)malloc(rows * sizeof(int *));
+    for (int i = 0; i < rows; i++)
+        response[i] = (int *)malloc(columns * sizeof(int));
+
     FILE *fp = fopen(fileName, "r");
 
-    if (fp == NULL)
+    char *row = NULL;
+    size_t len = 0;
+    int i = 0;
+    while (getline(&row, &len, fp) > 0)
     {
-        printf("Error: could not open file %s", fileName);
-        return "Error: could not open file";
+        int *arrayRow = getRow(row);
+        response[i++] = arrayRow;
     }
-
-    char ch;
-    while ((ch = fgetc(fp)) != EOF)
-    {
-        if (ch == '\n')
-        {
-            printf("Salto de linea");
-        }
-    }
-    // putchar(ch);
-
-    // close the file
     fclose(fp);
-    return "Hola";
+    return response;
+}
+
+int *getRow(char *row)
+{
+    int n = strlen(row);
+    int sizeNumbers = ceil((double)n / 2);
+    int *response = malloc(sizeNumbers * sizeof(int));
+    int count = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if (row[i] == ',')
+            continue;
+        if (row[i] == '-')
+        {
+            response[count++] = (-row[i + 1]) + '0';
+            i = i + 2;
+            continue;
+        }
+        response[count++] = row[i] - '0';
+    }
+    return response;
 }
 
 int sizeRows(char *fileName)
@@ -31,7 +55,7 @@ int sizeRows(char *fileName)
         return 0;
     FILE *fp = fopen(fileName, "r");
     char ch;
-    int size;
+    int size = 0;
     while ((ch = fgetc(fp)) != EOF)
         if (ch == '\n')
             size++;
@@ -44,15 +68,16 @@ int sizeColumns(char *fileName)
         return 0;
     FILE *fp = fopen(fileName, "r");
     char ch;
-    int size;
+    int size = 0;
     while ((ch = fgetc(fp)) != '\n')
         if (ch == ',')
             size++;
     return size + 1;
 }
 
-int isMultiply(int *sizeA, int *sizeB){    
-    return sizeA[1]==sizeB[0];
+int isMultiply(int *sizeA, int *sizeB)
+{
+    return sizeA[1] == sizeB[0];
 }
 
 int existsFile(char *fileName)
