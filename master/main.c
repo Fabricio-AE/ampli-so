@@ -20,16 +20,6 @@ int main(int argc, char **argv)
 {
     // initSocket();
 
-    char buffer[100];
-    char buffer2[1024] = {};
-    /*
-    snprintf(buffer, 100, "%d", num);
-    strcat(buffer2,operation);
-    strcat(buffer2,buffer);
-    //strcpy(buffer2, strcat(buffer2,operation));
-    printf("\n%s\n", buffer2);
-    */
-
     int **matrixA = getMatrix("A.txt");
     int **matrixB = getMatrix("B.txt");
     
@@ -38,43 +28,7 @@ int main(int argc, char **argv)
 
     int rowsA = sizeRows("A.txt");
     int columnsB = sizeColumns("B.txt");
-    /*
-    int columnsA = sizeColumns("A2.txt");
-    int rowsB = sizeRows("B2.txt");
-
-    int **result = (int **)malloc(rowsA * sizeof(int *));
-    for (int i = 0; i < rowsA; i++)
-        result[i] = (int *)malloc(columnsB * sizeof(int));
-
-    char ***operations = (char ***)malloc(rowsA * sizeof(char **));
-    for (int i = 0; i < rowsA; i++){
-        operations[i] = (char **)malloc(columnsB * sizeof(char*));
-        for (int j = 0; j < columnsB; j++)
-        {
-            operations[i][j] = (char *)malloc(100* sizeof(char));
-        }
-    }
     
-    for (int i = 0; i < rowsA; i++)
-    {
-        for (int j = 0; j < columnsB; j++)
-        {
-            result[i][j] = 0;
-            for (int k = 0; k < columnsA; k++)
-            {
-                snprintf(buffer, 100, "%d*%d", matrixA[i][k], matrixB[k][j]);
-                if (k + 1 != columnsA)
-                    strcat(buffer, "+");
-                strcat(buffer2, buffer);
-                strcpy(operations[i][j], buffer2);
-                result[i][j] += matrixA[i][k] * matrixB[k][j];
-            }
-            printf("%s \t", buffer2);
-            strcpy(buffer2, "");
-        }
-        printf("\n");
-    }
-    */
     for (int i = 0; i < rowsA; i++)
     {
         for (int j = 0; j < columnsB; j++)
