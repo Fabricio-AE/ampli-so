@@ -34,17 +34,13 @@ int *getRow(char *row)
     int sizeNumbers = ceil((double)n / 2);
     int *response = malloc(sizeNumbers * sizeof(int));
     int count = 0;
-    for (int i = 0; i < n; i++)
+    char *charNumber = strtok(strdup(row), " , ");
+    int intNumber;
+    while (charNumber != NULL)
     {
-        if (row[i] == ',')
-            continue;
-        if (row[i] == '-')
-        {
-            response[count++] = (-row[i + 1]) + '0';
-            i = i + 2;
-            continue;
-        }
-        response[count++] = row[i] - '0';
+        sscanf(charNumber, "%d", &intNumber);
+        response[count++] = intNumber;
+        charNumber = strtok(NULL, " , ");
     }
     return response;
 }

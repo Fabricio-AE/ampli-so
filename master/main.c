@@ -8,6 +8,7 @@
 #include <unistd.h> // read(), write(), close()
 #include "data.h"
 #include "string.h"
+#include "calculator.h"
 #define MAX 80
 #define PORT 8080
 #define SA struct sockaddr
@@ -18,13 +19,20 @@ void listenClients(int *params);
 int main(int argc, char **argv)
 {
     // initSocket();
-    int ** matrix = getMatrix("A.txt");
-    int rows = sizeRows("A.txt");
-    int columns = sizeColumns("A.txt");
 
-    for (int i = 0; i < rows; i++){
-        for (int j = 0; j < columns; j++)
-            printf("%d, ", matrix[i][j]);
+    int **matrixA = getMatrix("A.txt");
+    int **matrixB = getMatrix("B.txt");
+    
+
+    char ***operations = getMatrixOperations(matrixA, matrixB);
+
+    int rowsA = sizeRows("A.txt");
+    int columnsB = sizeColumns("B.txt");
+    
+    for (int i = 0; i < rowsA; i++)
+    {
+        for (int j = 0; j < columnsB; j++)
+            printf("%s \t", operations[i][j]);
         printf("\n");
     }
     return 0;
