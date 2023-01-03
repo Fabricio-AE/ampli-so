@@ -1,12 +1,10 @@
-
 #include "calculator.h"
-#define ARRAYSIZE(a) (sizeof(a) / sizeof(a[0]))
 
-char ***getMatrixOperations(int **matrixA, int **matrixB)
+char ***getMatrixOperations(int **matrixA, int **matrixB, int *sizeA, int *sizeB)
 {
-    int rowsA = ARRAYSIZE(*matrixA);
-    int columnsA = ARRAYSIZE(matrixA[0]);
-    int columnsB = ARRAYSIZE(matrixB[0]);
+    int rowsA = sizeA[0];
+    int columnsA = sizeA[1];
+    int columnsB = sizeB[1];
     char product[1024] = {};
     char equation[1024] = {};
 
@@ -36,4 +34,16 @@ char ***getMatrixOperations(int **matrixA, int **matrixB)
         }
     }
     return operations;
+}
+
+char **distributeMatrix(char ***operations, int sizeSlaves){
+    struct Node *head = NULL;
+    insertFirst(&head, 1, "Hola");
+    insertFirst(&head, 2, "Mucho");
+    insertFirst(&head, 3, "Gusto");
+
+    printList(head);
+
+    char *prueba[] = {"Sipi", "Or", "Nopi"};
+    return prueba;
 }
