@@ -9,11 +9,12 @@ char ***getMatrixOperations(int **matrixA, int **matrixB, int *sizeA, int *sizeB
     char equation[1024] = {};
 
     char ***operations = (char ***)malloc(rowsA * sizeof(char **));
-    for (int i = 0; i < rowsA; i++){
-        operations[i] = (char **)malloc(columnsB * sizeof(char*));
+    for (int i = 0; i < rowsA; i++)
+    {
+        operations[i] = (char **)malloc(columnsB * sizeof(char *));
         for (int j = 0; j < columnsB; j++)
         {
-            operations[i][j] = (char *)malloc(100* sizeof(char));
+            operations[i][j] = (char *)malloc(100 * sizeof(char));
         }
     }
 
@@ -36,14 +37,45 @@ char ***getMatrixOperations(int **matrixA, int **matrixB, int *sizeA, int *sizeB
     return operations;
 }
 
-char **distributeMatrix(char ***operations, int sizeSlaves){
-    struct Node *head = NULL;
-    insertFirst(&head, 1, "Hola");
-    insertFirst(&head, 2, "Mucho");
-    insertFirst(&head, 3, "Gusto");
-
-    printList(head);
-
-    char *prueba[] = {"Sipi", "Or", "Nopi"};
-    return prueba;
+Slave **distributeMatrix(char ***operations, int *size, int sizeSlaves)
+{
+    Slave **slaves = createArraySlaves(sizeSlaves);
+    Operation *operationTemp;
+    int indexSlave = 0;
+    for (int i = 0; i < size[0]; i++)
+    {
+        for (int j = 0; j < size[1]; j++)
+        {
+            operationTemp = initOperation(i, j, operations[i][j]);
+            insert(slaves[indexSlave]->operations, (void *)operationTemp);
+            indexSlave = ((indexSlave + 1) % sizeSlaves);
+        }
+    }
+    return slaves;
 }
+
+/*
+    Slave 1
+    i:1/j:1/operation:1*5+-1*2+3*0
+    i:1/j:2/operation:1*-3+-1*1+3*3
+
+    Slave 2
+
+    {
+        id: 1,
+        action: "matrix",
+        operations: [
+            {
+                i: 1,
+                j: 1,
+                operation: "1*5+-1*2+3*0"
+            },
+            {
+                i: 1,
+                j: 2,
+                operation: "1*-3+-1*1+3*3"
+            }
+        ]
+    }
+
+*/
