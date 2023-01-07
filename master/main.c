@@ -49,7 +49,17 @@ int main(int argc, char **argv)
         |slave2| : |1*-3+-1*1+3*3| -> ...
         ...
     */
-    distributeMatrix(operations, 2);
-
+    int sizeOperations[] = {rowsA, columnsB};
+    int sizeSlaves = 2;
+    Slave **slaves = distributeMatrix(operations, sizeOperations, sizeSlaves);
+/*
+    for (int i = 0; i < sizeSlaves; i++)
+    {
+        printf("|slave-%d| : ", i);
+        for (int j = 0; j < getSize(slaves[i]->operations); j++)
+            printf("|%s| -> ", ((Operation *)get(slaves[i]->operations, j))->strOperation);
+        printf("NULL\n");
+    }
+*/
     return 0;
 }
