@@ -10,7 +10,7 @@ int sizeB[2];
 
 void init()
 {
-    char *ip = "127.0.0.1";
+    char *ip = "192.168.0.15";
     int port = 6000;
     initServer(ip, port);
     menu();
@@ -100,7 +100,7 @@ int task(int option)
 
     case 4:
         int **temp = getMatrixResults();
-        printf("Matriz de resuldado : %d \n\n");
+        printf("Matriz de resuldado : \n\n");
         for (int i = 0; i < sizeA[0]; i++)
         {
             for (int j = 0; j < sizeB[1]; j++)
