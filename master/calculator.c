@@ -37,9 +37,8 @@ char ***getMatrixOperations(int **matrixA, int **matrixB, int *sizeA, int *sizeB
     return operations;
 }
 
-Slave **distributeMatrix(char ***operations, int *size, int sizeSlaves)
+void distributeMatrix(char ***operations, int *size, List *slaves, int sizeSlaves)
 {
-    Slave **slaves = createArraySlaves(sizeSlaves);
     Operation *operationTemp;
     int indexSlave = 0;
     for (int i = 0; i < size[0]; i++)
@@ -47,35 +46,8 @@ Slave **distributeMatrix(char ***operations, int *size, int sizeSlaves)
         for (int j = 0; j < size[1]; j++)
         {
             operationTemp = initOperation(i, j, operations[i][j]);
-            insert(slaves[indexSlave]->operations, (void *)operationTemp);
+            insert(((Slave *)get(slaves, indexSlave))->operations, (void *)operationTemp);
             indexSlave = ((indexSlave + 1) % sizeSlaves);
         }
     }
-    return slaves;
 }
-
-/*
-    Slave 1
-    i:1/j:1/operation:1*5+-1*2+3*0
-    i:1/j:2/operation:1*-3+-1*1+3*3
-
-    Slave 2
-
-    {
-        id: 1,
-        action: "matrix",
-        operations: [
-            {
-                i: 1,
-                j: 1,
-                operation: "1*5+-1*2+3*0"
-            },
-            {
-                i: 1,
-                j: 2,
-                operation: "1*-3+-1*1+3*3"
-            }
-        ]
-    }
-
-*/

@@ -1,100 +1,181 @@
 #include "socket.h"
 
-#define MAX 80
-#define PORT 8080
-#define SA struct sockaddr
+#define COM_MAXLINE 512
+#define MAXTEXT 450
 
-void initSocket()
+bool conexion_activa = false;
+Socket *sock = NULL;
+pthread_t *listenToSlavesThread;
+List *slaves;
+int **matrixResults1;
+int *sizeMatrixResults;
+
+char *actions[] = {
+    "Matrix",
+    "Pi",
+    "SALIR"};
+int actionsSize = 3;
+
+void initServer(char *ip, int serverPort)
 {
-    /*
-    int socketFd, connectionFd, len;
-    struct sockaddr_in addressServer, cli;
+    sock = (Socket *)malloc(sizeof(Socket));
 
-    socketFd = socket(AF_INET, SOCK_STREAM, 0);
+    // int i, status, id;
 
-    if (socketFd == -1)
-    {
-        printf("socket creation failed...\n");
-        exit(0);
-    }
+    // Open TCP internet STREAM socket
+    if ((sock->socketfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+        perror("server: Can't open stream socket");
     else
-        printf("Socket successfully created..\n");
+        printf("Socket created!\n");
 
-    bzero(&addressServer, sizeof(addressServer));
-    addressServer.sin_family = AF_INET;
-    addressServer.sin_addr.s_addr = htonl(INADDR_ANY);
-    addressServer.sin_port = htons(PORT);
-
-    if ((bind(socketFd, (SA *)&addressServer, sizeof(addressServer))) != 0)
+    // Bind local address to allow the client to connect
+    bzero((char *)&sock->server_addr, sizeof(sock->server_addr));
+    sock->server_addr.sin_family = AF_INET;
+    sock->server_addr.sin_addr.s_addr = inet_addr(ip);
+    sock->server_addr.sin_port = htons(serverPort);
+    if (bind(sock->socketfd, (struct sockaddr *)&sock->server_addr,
+             sizeof(sock->server_addr)) < 0)
     {
-        printf("socket bind failed...\n");
-        exit(0);
+        perror("server: can't bind local address");
+        exit(1);
     }
-    else
-        printf("Socket successfully binded..\n");
+    listen(sock->socketfd, 8); // la función listen habilita el socket para recibir conexiones
+    conexion_activa = true;
 
-    if ((listen(socketFd, 5)) != 0)
-    {
-        printf("Listen failed...\n");
-        exit(0);
-    }
-    else
-        printf("Server Listening..\n");
-    len = sizeof(cli);
+    listenToSlavesThread = (pthread_t *)malloc(sizeof(pthread_t));
+    pthread_create(&listenToSlavesThread, NULL, insertSlave, NULL);
+}
+
+void initMatrix(int *sizeMatrix){
+    sizeMatrixResults = sizeMatrix;
+    matrixResults1 = (int **)malloc(sizeMatrix[0] * sizeof(int *));
+    for (int i = 0; i < sizeMatrix[1]; i++)
+        matrixResults1[i] = (int *)malloc(sizeMatrix[1] * sizeof(int));
+}
+
+void *insertSlave(void *arg)
+{
+    slaves = createList();
+    int num_esclavos = 0;
 
     while (1)
     {
+        sock->client_len = sizeof(sock->client_addr);
 
-        // Accept the data packet from client and verification
-        connectionFd = accept(socketFd, (SA *)&cli, &len);
-        if (connectionFd < 0)
+        // se intenta aceptar la conexión, y es almacenada en el atributo new_sd del socket
+        sock->new_sd = accept(sock->socketfd, (struct sockaddr *)&sock->client_addr, &sock->client_len);
+        if (sock->new_sd < 0)
         {
-            printf("server accept failed...\n");
+            printf("Error aceptando peticiones\n");
             exit(0);
         }
         else
-            printf("server accept the client %i - %d\n", socketFd, &cli.sin_addr.s_addr);
-
-        int params[] = {&connectionFd, &socketFd};
-
-        pthread_t threadListe;
-        pthread_create(&threadListe, NULL, listenClients, params);
-    }
-    */
-}
-
-void listenClients(int *params)
-{
-    /*
-    int connectionFd = params[0];
-    int socketFd = params[1];
-    char buff[MAX];
-    int n;
-    // infinite loop for chat
-    while (1)
-    {
-        bzero(buff, MAX);
-
-        // read the message from client and copy it in buffer
-        read(connectionFd, buff, sizeof(buff));
-        // print buffer which contains the client contents
-        printf("From client: %s\t To client : ", buff);
-        bzero(buff, MAX);
-        n = 0;
-        // copy server message in the buffer
-        while ((buff[n++] = getchar()) != '\n')
-            ;
-
-        // and send that buffer to client
-        write(connectionFd, buff, sizeof(buff));
-
-        // if msg contains "Exit" then server exit and chat ended.
-        if (strncmp("exit", buff, 4) == 0)
         {
-            printf("Server Exit...\n");
-            break;
+            // Se añade el esclavo al sistema:
+            Slave *new_slave = initSlave();
+            new_slave->id = num_esclavos;
+            new_slave->socketFd = sock->new_sd;
+            new_slave->isConnected = true;
+
+            insert(slaves, new_slave);
+            printf("Esclavo añadido\n");
+            pthread_t *listenSlavesThread = (pthread_t *)malloc(sizeof(pthread_t));
+            pthread_create(&listenSlavesThread, NULL, listenSlaves, (void *)new_slave);
+            fflush(stdout);
+            num_esclavos++;
         }
     }
-    close(socketFd);
-    */
+}
+
+
+void* listenSlaves(void* data){
+    Slave *slave = (Slave *) data;
+    char buffer[COM_MAXLINE];
+    int action = -1;
+    while(slave->isConnected){
+        recv(slave->socketFd, buffer, COM_MAXLINE, 0);
+        action = getAction(buffer);
+        if(action == 0){
+            setToMatrixResult(buffer);
+        } else if(action == 2){
+            slave->isConnected = false;
+            continue;
+        }
+        //doTask(buffer);
+    }
+    close(slave->socketFd);
+    return;
+}
+
+void doTask(char * message){
+    printf("Message: %s\n", message);
+    char *token = strtok(strdup(message), " | ");
+    if(strcmp(message, "Matrix") == 0){
+        
+    }
+}
+
+void sendToSlaves(List *slaves, char *action)
+{
+    char message[COM_MAXLINE];
+    for (int i = 0; i < getSize(slaves); i++)
+    {
+        Slave *temp = ((Slave *)get(slaves, i));
+        for (int j = 0; j < getSize(temp->operations); j++)
+        {
+            Operation *aux = ((Operation *)get(temp->operations, j));
+            snprintf(message, COM_MAXLINE, "%s|%d|%d|%s", action, aux->i, aux->j, aux->strOperation);
+            sendMessage(temp, message);
+            printf("%s del slave %d\n", message, temp->id);
+        }
+    }
+}
+
+bool sendMessage(Slave *slave, char *message)
+{
+    send(slave->socketFd, message, COM_MAXLINE, 0);
+    //recv(slave->socketFd, message, COM_MAXLINE, 0);
+    return true;
+}
+
+List *getSlaves()
+{
+    return slaves;
+}
+
+void closeConnection(Slave *slave)
+{
+    slave->isConnected = false;
+    close(slave->socketFd);
+}
+
+void closeServer(){
+    char message[COM_MAXLINE];
+    snprintf(message, COM_MAXLINE, "%s|0", "SALIR");
+    for (int i = 0; i < slaves->size; i++)
+    {
+        sendMessage(((Slave *)get(slaves, i)), message);
+    }
+    
+    close(sock->socketfd);
+}
+
+int getAction(char *data){
+    char *token = strtok(strdup(data), "|");
+    for (int i = 0; i < actionsSize; i++)
+        if (strcmp(actions[i], token) == 0)
+            return i;
+    return -1;
+}
+
+void setToMatrixResult(char * input){
+    char *token = strtok(strdup(input), "|");
+    int i = atoi(strtok(NULL, "|"));
+    int j = atoi(strtok(NULL, "|"));
+    int result = atoi(strtok(NULL, "|"));
+    matrixResults1[i][j] = result;
+}
+
+int **getMatrixResults() {
+    return matrixResults1;
 }

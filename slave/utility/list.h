@@ -4,9 +4,6 @@
 #include <stdbool.h>
 #include "node.h"
 
-#ifndef _LIST_
-#define _LIST_
-
 typedef struct list
 {
    Node *head;
@@ -23,5 +20,3 @@ void eliminarFinal(List *);
 void delete(List *, int);
 int getSize(List *);
 bool isEmpty(List *);
-
-#endif
