@@ -5,6 +5,11 @@
         "string.h": "c",
         "in.h": "c",
         "unistd.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "stdbool.h": "c",
+        "socket.h": "c",
+        "slave.h": "c",
+        "list.h": "c",
+        "operation.h": "c"
     }
 }

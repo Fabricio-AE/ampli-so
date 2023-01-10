@@ -6,7 +6,7 @@
 #ifndef _SLAVE_
 #define _SLAVE_
 
-#include "../utility/list.h"
+#include "utility/list.h"
 
 typedef struct slave {
     int id;
@@ -15,15 +15,8 @@ typedef struct slave {
     List *operations;
 }Slave;
 
-typedef struct operation {
-    int i;
-    int j;
-    char *strOperation;
-}Operation;
-
 
 Slave *initSlave();
 Slave **createArraySlaves(int);
-Operation *initOperation(int, int, char*);
 
 #endif
